@@ -23,7 +23,7 @@ struct Pixel
     ~Pixel(){}
 
     inline void save_on_file(std::ofstream& fout) const {
-
+        
         unsigned char b = static_cast<unsigned char>(blue  * 255.f);
         unsigned char g = static_cast<unsigned char>(green * 255.f);
         unsigned char r = static_cast<unsigned char>(red   * 255.f);

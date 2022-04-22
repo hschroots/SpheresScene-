@@ -5,10 +5,8 @@
 
 enum ShadingModel
 {
-    BlinnPhong = 0,
-    ReflectOnly,
-    RefractOnly,
-    ReflectAndRefract,
+    Opaque = 0,
+    Transparent,
     NUM_SHADING_MODELS
 };
 
@@ -17,11 +15,14 @@ class ObjectBase
     public:
 	ObjectBase(){};
 	virtual ~ObjectBase() = 0;
+    virtual glm::vec3 ColorAt(const glm::vec3 position) = 0;
 
     public:
     ShadingModel shadingType;
     glm::vec3 color;
-	float IndexOfRefraction;
+    float reflectivity;
+    float transmittance;
+    float IndexOfRefraction;
     Transform transform;
 };
 ObjectBase::~ObjectBase() {}

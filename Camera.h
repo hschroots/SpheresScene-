@@ -15,9 +15,9 @@ class Camera
 	public:
 
 	Camera() : eyepos(0.0f, 0.0f, 0.0f),
-                forward(0.0f, 0.0f, 1.0f),
+                forward(0.0f, 0.0f, -1.0f),
                 up(0.0f, 1.0f, 0.0f),
-                right(1.0f, 0.0f, 0.0f),
+                right(1.0f, 0.0f, 0.f),
                 vfov(DEG_TO_RAD * 60.0f)
     {
         aspect_ratio = 640.f / 480.f;
@@ -39,7 +39,7 @@ class Camera
 
     Ray generateRay(float u, float v)
     {
-        return Ray(eyepos, bottomleft + u*horizontal_size + v*vertical_size);
+        return Ray(eyepos, glm::normalize(bottomleft + u*horizontal_size + v*vertical_size - eyepos));
     }
 
 	public:
@@ -63,11 +63,15 @@ class Camera
         float viewport_height = 2.0f * tan(0.5f * vfov);
         float viewport_width = aspect_ratio * viewport_height;
 
-        horizontal_size = glm::vec3(viewport_width, 0.f, 0.f);
+        horizontal_size = glm::vec3(viewport_width,0.f, 0.f);
         vertical_size = glm::vec3(0.f, viewport_height, 0.f);
 
         bottomleft = eyepos + forward - 0.5f * horizontal_size - 0.5f * vertical_size;
 
         std::cout << "Bottom left is " << bottomleft.x  << "," << bottomleft.y << "," << bottomleft.z << std::endl;
+        
+        Ray centerRay = generateRay(0.5f, 0.5f);
+        glm::vec3 centerdir = centerRay.direction;
+        std::cout << "Center Direction is " << centerdir.x  << "," << centerdir.y << "," << centerdir.z << std::endl;
     }
 };

@@ -41,7 +41,7 @@ class Renderer
         ss << "(" << v.x << "," << v.y << "," << v.z << ")";
 		return ss.str();
     }
-
+/*
 	bool intersectSphere(Ray& ray, Sphere obj, HitRecord& hitRec, bool debug)
 	{
 		//float t_imageplane = (float)glm::
@@ -93,30 +93,35 @@ class Renderer
 		}
 		return false;
 	}
-	bool intersectPlane(glm::vec3 rayOrigin, glm::vec3 ray, Plane obj, HitRecord& rec, bool debug)
+	*/
+	bool intersectPlane(Ray& ray, Plane obj, HitRecord& rec, bool debug)
 	{
-		glm::vec3 uray = glm::normalize(ray);
+		glm::vec3 uray = glm::normalize(ray.direction);
 		glm::vec3 n = obj.planeNormal;
-		float eps = 0.000001;
+		float eps = 0.000001f;
 		// assuming vectors are all normalized
 		float denom = glm::dot(n, uray);
+		if(denom < 0.f)
+			rec.front_face = true;
+		else
+			rec.front_face = false;
 		if (std::abs(denom) > eps) { 
-			glm::vec3 p0l0 = obj.planePosition - rayOrigin; 
+			glm::vec3 p0l0 = obj.planePosition - ray.origin; 
 			//p0l0 = glm::normalize(p0l0);
 			float t = glm::dot(p0l0, n) / denom;
-			if(t >= 0)
+			if(t >= ray.tmin && t <= ray.tmax)
 			{
 				rec.numHits = 1;
 				rec.t = t;
-				rec.hitPoint = rayOrigin + (t * uray);
+				rec.hitPoint = ray.origin + (t * uray);
 				rec.hitNormal = glm::normalize(n);
 				return true;
 			}
-		} 
+		}
 		return false;
 	}
 
-	bool intersect(Ray& ray, ObjectBase* obj, HitRecord& rec, bool debug)
+	bool intersect(Ray& ray, ObjectBase* obj, HitRecord& rec, string type, bool debug)
 	{
 		// int dataType
 		// 0 - Sphere
@@ -140,7 +145,7 @@ class Renderer
 			case 0:
 					{
 					Sphere *s = dynamic_cast<Sphere*>(obj);
-					if(s->intersect(ray, rec, debug))
+					if(s->intersect(ray, rec, type, debug))
 					//if(intersectSphere(ray, *s, hitRec, debug))
 					{
 						return true;
@@ -151,7 +156,7 @@ class Renderer
 			case 1:
 					{
 					Plane *p = dynamic_cast<Plane*>(obj);
-					return intersectPlane(ray.origin, ray.direction, *p, rec, debug);
+					return intersectPlane(ray, *p, rec, debug);
 					}
 			break;
 			default:
